@@ -6,16 +6,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Xlab_Task.Models
 {
-    [Table("Invoice")]
-    public partial class Invoice
+    public partial class Product
     {
         [Key]
-        public int Invoice_ID { get; set; }
-        [Required]
+        public int Product_ID { get; set; }
         [StringLength(50)]
         [Unicode(false)]
-        public string Client_Name { get; set; }
-        [Column(TypeName = "date")]
-        public DateTime? Invoice_Date { get; set; }
+        public string Product_Name { get; set; }
+        public double? Product_Price { get; set; }
     }
 }

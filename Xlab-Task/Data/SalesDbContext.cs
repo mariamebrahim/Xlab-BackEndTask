@@ -10,6 +10,7 @@ namespace Xlab_Task.Data
     {
         public virtual DbSet<Invoice> Invoices { get; set; }
         public virtual DbSet<Invoice_Detail> Invoice_Details { get; set; }
+        public virtual DbSet<Product> Products { get; set; }
 
         public SalesDbContext(DbContextOptions<SalesDbContext> options) : base(options)
         {
@@ -17,9 +18,19 @@ namespace Xlab_Task.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Invoice>(entity =>
+            {
+                entity.Property(e => e.Client_Name).IsUnicode(false);
+            });
+
             modelBuilder.Entity<Invoice_Detail>(entity =>
             {
-                entity.Property(e => e.Total_Price).HasComputedColumnSql("([Product_Quantity]*[Product_Price])", true);
+                entity.HasKey(e => new { e.Invoice_ID, e.Product_ID });
+            });
+
+            modelBuilder.Entity<Product>(entity =>
+            {
+                entity.Property(e => e.Product_Name).IsUnicode(false);
             });
 
             OnModelCreatingPartial(modelBuilder);
