@@ -34,50 +34,20 @@ namespace Xlab_Task.Controllers
 
         // GET: api/Invoice_Detail/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Invoice_Detail>> GetInvoice_Detail(int id)
+        public async Task<ActionResult<IEnumerable<sp_GetInvoiceTotalsResult>>> GetInvoice_Detail(int id)
         {
-          if (_context.Invoice_Details == null)
-          {
-              return NotFound();
-          }
-            var invoice_Detail = await _context.Invoice_Details.FindAsync(id);
-
-            if (invoice_Detail == null)
-            {
-                return NotFound();
-            }
-
-            return invoice_Detail;
+            var invTotalRecord = _context.GetInvoiceTotals.FromSqlInterpolated($"EXECUTE [dbo].[sp_GetInvoiceTotals] {id}").ToList();
+            return invTotalRecord;
         }
 
+
+        //Update invoice Items
         // PUT: api/Invoice_Detail/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutInvoice_Detail(int id, Invoice_Detail invoice_Detail)
+        [HttpPut]
+        public async Task<IActionResult> PutInvoice_Detail( Invoice_Detail invoice_Detail)
         {
-            if (id != invoice_Detail.Invoice_ID)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(invoice_Detail).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!Invoice_DetailExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
+            _context.Invoice_Details.FromSqlInterpolated($"EXECUTE [dbo].[sp_UpdateInvoiceItems] {invoice_Detail.Invoice_ID},{invoice_Detail.Product_ID},{invoice_Detail.Product_Price},{invoice_Detail.Product_Quantity}").ToList();
             return NoContent();
         }
 
@@ -86,48 +56,17 @@ namespace Xlab_Task.Controllers
         [HttpPost]
         public async Task<ActionResult<Invoice_Detail>> PostInvoice_Detail(Invoice_Detail invoice_Detail)
         {
-          if (_context.Invoice_Details == null)
-          {
-              return Problem("Entity set 'SalesDbContext.Invoice_Details'  is null.");
-          }
-            _context.Invoice_Details.Add(invoice_Detail);
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (Invoice_DetailExists(invoice_Detail.Invoice_ID))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return CreatedAtAction("GetInvoice_Detail", new { id = invoice_Detail.Invoice_ID }, invoice_Detail);
+            _context.Invoice_Details.FromSqlInterpolated($"EXECUTE [dbo].[sp_InsertItemsIntoInvoice] {invoice_Detail.Invoice_ID},{invoice_Detail.Product_ID},{invoice_Detail.Product_Price},{invoice_Detail.Product_Quantity}").ToList();
+            return NoContent();
         }
 
         // DELETE: api/Invoice_Detail/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteInvoice_Detail(int id)
+        [HttpDelete]
+        public async Task<IActionResult> DeleteInvoice_Detail(Invoice_Detail invoice_Detail)
         {
-            if (_context.Invoice_Details == null)
-            {
-                return NotFound();
-            }
-            var invoice_Detail = await _context.Invoice_Details.FindAsync(id);
-            if (invoice_Detail == null)
-            {
-                return NotFound();
-            }
-
-            _context.Invoice_Details.Remove(invoice_Detail);
-            await _context.SaveChangesAsync();
-
+            _context.Invoice_Details.FromSqlInterpolated($"EXECUTE [dbo].[sp_DeleteItemInvoice] {invoice_Detail.Invoice_ID},{invoice_Detail.Product_ID}").ToList();
             return NoContent();
+
         }
 
         private bool Invoice_DetailExists(int id)
