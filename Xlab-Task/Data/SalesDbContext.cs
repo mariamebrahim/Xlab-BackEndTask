@@ -12,6 +12,7 @@ namespace Xlab_Task.Data
         public virtual DbSet<Invoice_Detail> Invoice_Details { get; set; }
 
         public virtual DbSet<sp_GetInvoiceByIDResult> GetInvoiceByID { get; set; }
+        public virtual DbSet<sp_GetInvoiceTotalsResult> GetInvoiceTotals { get; set; }
 
         public SalesDbContext(DbContextOptions<SalesDbContext> options) : base(options)
         {

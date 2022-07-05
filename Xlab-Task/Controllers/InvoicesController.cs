@@ -33,6 +33,7 @@ namespace Xlab_Task.Controllers
             return await _context.Invoices.ToListAsync();
         }
 
+        //Get invoice details
         // GET: api/Invoices/5
         [HttpGet("{id}")]
         public async Task<ActionResult<IEnumerable<sp_GetInvoiceByIDResult>>> GetInvoice(int id)
