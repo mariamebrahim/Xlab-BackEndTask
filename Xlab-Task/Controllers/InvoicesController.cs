@@ -100,18 +100,9 @@ namespace Xlab_Task.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteInvoice(int id)
         {
-            if (_context.Invoices == null)
-            {
-                return NotFound();
-            }
-            var invoice = await _context.Invoices.FindAsync(id);
-            if (invoice == null)
-            {
-                return NotFound();
-            }
-
-            _context.Invoices.Remove(invoice);
-            await _context.SaveChangesAsync();
+            string StoredProc = "exec sp_deleteInvoice" +
+              "@Invoice_ID = " + id;
+            _context.Invoices.FromSqlRaw(StoredProc).ToList();
 
             return NoContent();
         }
