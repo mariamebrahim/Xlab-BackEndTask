@@ -20,6 +20,34 @@
       {
          "Name": "[dbo].[Invoice_Details]",
          "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[sp_CreateAnewInvoice]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[sp_deleteInvoice]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[sp_GetInvoiceByID]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[sp_GetInvoiceTotals]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[sp_InsertItemsIntoInvoice]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[sp_UpdateInvoice]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[sp_UpdateInvoiceItems]",
+         "ObjectType": 1
       }
    ],
    "UiHint": "DESKTOP-JRMFUAO.SalesDb",

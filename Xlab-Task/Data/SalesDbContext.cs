@@ -11,6 +11,8 @@ namespace Xlab_Task.Data
         public virtual DbSet<Invoice> Invoices { get; set; }
         public virtual DbSet<Invoice_Detail> Invoice_Details { get; set; }
 
+        public virtual DbSet<sp_GetInvoiceByIDResult> GetInvoiceByID { get; set; }
+
         public SalesDbContext(DbContextOptions<SalesDbContext> options) : base(options)
         {
         }
@@ -24,15 +26,12 @@ namespace Xlab_Task.Data
 
             modelBuilder.Entity<Invoice_Detail>(entity =>
             {
-                entity.Property(e => e.Total_Price).HasComputedColumnSql("([Product_Price]*[Product_Quantity])", false);
+                entity.HasKey(e => new { e.Invoice_ID, e.Product_ID });
 
-                entity.HasOne(d => d.Invoice)
-                    .WithMany()
-                    .HasForeignKey(d => d.Invoice_ID)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Invoice_Details_Invoice");
+                entity.Property(e => e.Total_Price).HasComputedColumnSql("([Product_Price]*[Product_Quantity])", false);
             });
 
+            OnModelCreatingGeneratedProcedures(modelBuilder);
             OnModelCreatingPartial(modelBuilder);
         }
 

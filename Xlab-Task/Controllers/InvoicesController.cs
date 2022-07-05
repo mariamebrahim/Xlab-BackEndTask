@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.SqlServer;
 using Xlab_Task.Data;
 using Xlab_Task.Models;
 
@@ -34,50 +35,20 @@ namespace Xlab_Task.Controllers
 
         // GET: api/Invoices/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Invoice>> GetInvoice(int id)
+        public async Task<ActionResult<IEnumerable<sp_GetInvoiceByIDResult>>> GetInvoice(int id)
         {
-          if (_context.Invoices == null)
-          {
-              return NotFound();
-          }
-            var invoice = await _context.Invoices.FindAsync(id);
-
-            if (invoice == null)
-            {
-                return NotFound();
-            }
-
-            return invoice;
+            var empRecord = _context.GetInvoiceByID.FromSqlInterpolated($"EXECUTE [dbo].[sp_GetInvoiceByID] {id}").ToList();
+            return empRecord;
         }
 
+
+        //Update Invoice
         // PUT: api/Invoices/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutInvoice(int id, Invoice invoice)
+        [HttpPut]
+        public async Task<IActionResult> UpdateInvoice( Invoice invoice)
         {
-            if (id != invoice.Invoice_ID)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(invoice).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!InvoiceExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
+            _context.Invoices.FromSqlInterpolated($"EXECUTE [dbo].[sp_UpdateInvoice] {invoice.Invoice_ID},{invoice.Client_Name},{invoice.Invoice_Date}").ToList();
             return NoContent();
         }
 
@@ -86,25 +57,17 @@ namespace Xlab_Task.Controllers
         [HttpPost]
         public async Task<ActionResult<Invoice>> PostInvoice(Invoice invoice)
         {
-          if (_context.Invoices == null)
-          {
-              return Problem("Entity set 'SalesDbContext.Invoices'  is null.");
-          }
-            _context.Invoices.Add(invoice);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetInvoice", new { id = invoice.Invoice_ID }, invoice);
+            _context.Invoices.FromSqlInterpolated($"EXECUTE [dbo].[sp_CreateAnewInvoice] {invoice.Client_Name},{invoice.Invoice_Date}").ToList();
+            return NoContent();
         }
 
         // DELETE: api/Invoices/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteInvoice(int id)
         {
-            string StoredProc = "exec sp_deleteInvoice" +
-              "@Invoice_ID = " + id;
-            _context.Invoices.FromSqlRaw(StoredProc).ToList();
-
+            _context.Invoices.FromSqlInterpolated($"EXECUTE [dbo].[sp_deleteInvoice] {id}").ToList();
             return NoContent();
+
         }
 
         private bool InvoiceExists(int id)
